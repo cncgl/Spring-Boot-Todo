@@ -1,6 +1,7 @@
 package jp.cogel.springboot.domain;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -10,24 +11,28 @@ import java.util.Date;
  */
 @Entity
 @Table(name="todos")
-public class Todo {
-    @Id @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="todos_id_seq")
+public class Todo implements Serializable {
+    private static final long serialVersionUID = 1835127006838671512L;
+
+    @Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="todos_id_seq")
     @SequenceGenerator(name="todos_id_seq", sequenceName="todos_id_seq", allocationSize=1)
     @Column(name="id")
-    private Integer id;
+    public Integer id;
     @Column(name="status")
-    private boolean status;
+    public boolean status;
     @Column(name="title")
-    private String title;
+    public String title;
 
     @Column(nullable=false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date inserted_at;
+    public Date inserted_at;
 
     @Column(nullable=false)
     @Temporal(TemporalType.TIMESTAMP)
     @Version
-    private Date updated_at;
+    public Date updated_at;
 
 
     // コンストラクタ
@@ -42,6 +47,14 @@ public class Todo {
 
     // アクセッサ
     //---------------------------
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    @GeneratedValue
+    public Integer getId() {
+        return id;
+    }
+
     @PrePersist
     public void updateInsertedAt() {
         this.inserted_at = new Date();
@@ -50,5 +63,13 @@ public class Todo {
     @PreUpdate
     public void updateUpdatedAt() {
         this.updated_at = new Date();
+    }
+
+    // オーバーライド
+    //----------------------------
+    @Override
+    public String toString() {
+        return "Todo {id:"+id+", status:"+status+", title:"+title
+                +" inserted_at:"+inserted_at+". updated_at:"+updated_at+"}";
     }
 }

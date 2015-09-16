@@ -1,9 +1,12 @@
 package jp.cogel.springboot.web;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import jp.cogel.springboot.domain.Todo;
+import jp.cogel.springboot.service.TodoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Todo を扱う REST コントローラー
@@ -12,30 +15,43 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/todos")
 public class TodoController {
+    @Autowired
+    TodoService todoService;
 
     @RequestMapping(method=RequestMethod.GET)
-    public String index() {
-        return "index";
+    public List<Todo> index() {
+        //return "index";
+        List<Todo> todos = todoService.findAll();
+        return todos;
     }
 
     @RequestMapping(value="/{id}", method=RequestMethod.GET)
-    public String show(@PathVariable int id) {
-        return "show:" + id;
+    public Todo show(@PathVariable Integer id) {
+        //return "show:" + id;
+        Todo todo = todoService.findOne(id);
+        return todo;
     }
 
     @RequestMapping(method=RequestMethod.POST)
-    public String create() {
-        return "create";
+    @ResponseStatus(HttpStatus.CREATED)
+    public Todo create(@RequestBody Todo todo) {
+        //return "create";
+        return todoService.create(todo);
     }
 
     @RequestMapping(value="/{id}", method={RequestMethod.PUT, RequestMethod.PATCH})
-    public String update(@PathVariable int id) {
-        return "update:" + id;
+    public Todo update(@PathVariable int id, @RequestBody Todo todo) {
+        //return "update:" + id;
+        todo.setId(Integer.valueOf(id));
+        //System.out.println(todo);
+        return todoService.update(todo);
     }
 
     @RequestMapping(value="/{id}", method=RequestMethod.DELETE)
-    public String delete(@PathVariable int id) {
-        return "delete:" + id;
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable int id) {
+        //return "delete:" + id;
+        todoService.delete(id);
     }
 
 }
